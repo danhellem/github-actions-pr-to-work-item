@@ -1,0 +1,28 @@
+name: 'Pull Requests to Work Item'
+description: 'Create a work item in Azure DevOps when a Pull Request is created'
+author: 'danhellem'
+branding:
+  icon: "git-pull-request"
+  color: "blue"
+inputs:
+  ado_token: 
+    description: 'Azyre DevOps Personal Access Token'
+    default: ''
+  ado_organization:
+    description: 'Organization Name'
+    default: ''
+  ado_project: 
+    description: 'Project Name'
+    default: ''
+  ado_wit: 
+    description: 'Work Item Type'
+    default: 'User Story' 
+  ado_close_state: 
+    description: 'Closed State'
+    default: 'Closed' 
+outputs:
+  id:
+    description: "id of work item created"
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
