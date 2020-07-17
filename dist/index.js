@@ -6869,12 +6869,12 @@ const sample_webhookpayload_1 = __importDefault(__webpack_require__(78));
 const workitems_1 = __webpack_require__(445);
 const github_pr_1 = __webpack_require__(515);
 const patch_documents_1 = __webpack_require__(286);
-const debug = true;
-const ado_org = 'privatepreview';
-const ado_project = 'agile';
-const ado_token = 'yw2k4dguht6vnj4pkkyzup5ynftwvqji2pfxp6xz6a5syr7uj6wq';
+const debug = false;
+const ado_org = '';
+const ado_project = '';
+const ado_token = '';
 const ado_wit = 'Pull Request';
-const github_token = 'f3c056652f77228e3d83414bf8518dc16576331f';
+const github_token = '';
 // prettier-ignore
 function getEnvInputs() {
     const vm = new env_inputs_1.default();
