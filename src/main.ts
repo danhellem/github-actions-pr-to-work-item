@@ -52,7 +52,7 @@ function getWebHookPayLoad(): Payload {
   vm.repo_owner = body.repository?.owner !== undefined ? body.repository.owner.login : ''
   vm.body = body.pull_request?.body !== undefined ? body.pull_request?.body : ''
 
-  vm.body = vm.body.replace("/r/n", "<br>")
+  vm.body = vm.body.replace(new RegExp('\\r?\\n','g'), '<br />')
 
   return vm
 }
@@ -108,6 +108,8 @@ async function run(): Promise<void> {
             : response
 
         if (debug) console.log(pr)
+
+        if (!pr.success) console.log(`Warning: ${pr.message}`)
       } else {
         core.setFailed(
           `Error creating work item in Azure DevOps: ${createResult.message}`

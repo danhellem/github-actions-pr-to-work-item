@@ -26,6 +26,8 @@ export function editedPatchDocument(
     ? workItem.fields['System.Description']
     : ''
 
+  payload.body = payload.body.replace(`\r\nAB#${workItem.id}`, '')
+
   const pr_title = `${payload.title} (GitHub PR #${payload.number})`
   const pr_desc = `${payload.body.trim()}<br><br>GitHub <a href="${
     payload.url

@@ -1,7 +1,7 @@
 import {WebhookPayload} from '@actions/github/lib/interfaces'
 
 const sampleWebHookPayload: WebhookPayload = {
-  action: 'edited',
+  action: 'opened',
   number: 6,
   pull_request: {
     url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/pulls/6',
@@ -38,7 +38,8 @@ const sampleWebHookPayload: WebhookPayload = {
       type: 'User',
       site_admin: true
     },
-    body: 'Hello World',
+    body:
+      'Simple comment\r\n\r\nhello world\r\nSimple comment\r\n\r\nhello world',
     created_at: '2020-05-06T16:34:25Z',
     updated_at: '2020-05-06T16:34:25Z',
     closed_at: null,

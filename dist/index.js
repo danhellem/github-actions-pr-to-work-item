@@ -3033,7 +3033,7 @@ exports.TaskAgentApi = TaskAgentApi;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const sampleWebHookPayload = {
-    action: 'edited',
+    action: 'opened',
     number: 6,
     pull_request: {
         url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/pulls/6',
@@ -3067,7 +3067,7 @@ const sampleWebHookPayload = {
             type: 'User',
             site_admin: true
         },
-        body: 'Hello World',
+        body: 'Simple comment\r\n\r\nhello world\r\nSimple comment\r\n\r\nhello world',
         created_at: '2020-05-06T16:34:25Z',
         updated_at: '2020-05-06T16:34:25Z',
         closed_at: null,
@@ -6901,7 +6901,7 @@ function getWebHookPayLoad() {
     vm.repo_fullname = ((_f = body.repository) === null || _f === void 0 ? void 0 : _f.full_name) !== undefined ? body.repository.full_name : '';
     vm.repo_owner = ((_g = body.repository) === null || _g === void 0 ? void 0 : _g.owner) !== undefined ? body.repository.owner.login : '';
     vm.body = ((_h = body.pull_request) === null || _h === void 0 ? void 0 : _h.body) !== undefined ? (_j = body.pull_request) === null || _j === void 0 ? void 0 : _j.body : '';
-    vm.body = vm.body.replace("/r/n", "<br>");
+    vm.body = vm.body.replace(new RegExp('\\r?\\n', 'g'), '<br />');
     return vm;
 }
 function run() {
@@ -6946,6 +6946,8 @@ function run() {
                         : response;
                     if (debug)
                         console.log(pr);
+                    if (!pr.success)
+                        console.log(`Warning: ${pr.message}`);
                 }
                 else {
                     core.setFailed(`Error creating work item in Azure DevOps: ${createResult.message}`);
@@ -18766,6 +18768,7 @@ function editedPatchDocument(env, payload, workItem) {
     const system_description = workItem.fields
         ? workItem.fields['System.Description']
         : '';
+    payload.body = payload.body.replace(`\r\nAB#${workItem.id}`, '');
     const pr_title = `${payload.title} (GitHub PR #${payload.number})`;
     const pr_desc = `${payload.body.trim()}<br><br>GitHub <a href="${payload.url}">Pull Request #${payload.number}</a> created in <a href="${payload.repo_url}">${payload.repo_fullname}</a>`;
     if (system_title === pr_title && system_description === pr_desc) {
