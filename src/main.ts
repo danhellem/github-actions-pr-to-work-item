@@ -9,7 +9,11 @@ import sampleWebHookPayload from './debug/sample.webhookpayload'
 import {fetch, create, update} from './workitems'
 import {update as updatePr} from './github-pr'
 import {IResponse} from './interfaces/base-response'
-import {IPatchDocumentResponse, editedPatchDocument} from './patch-documents'
+import {
+  IPatchDocumentResponse,
+  editedPatchDocument,
+  closedPatchDocument
+} from './patch-documents'
 
 const debug = false
 const ado_org = ''
@@ -47,6 +51,8 @@ function getWebHookPayLoad(): Payload {
   vm.repo_fullname = body.repository?.full_name !== undefined ? body.repository.full_name : ''
   vm.repo_owner = body.repository?.owner !== undefined ? body.repository.owner.login : ''
   vm.body = body.pull_request?.body !== undefined ? body.pull_request?.body : ''
+
+  vm.body = vm.body.replace("/r/n", "<br>")
 
   return vm
 }
@@ -153,6 +159,24 @@ async function run(): Promise<void> {
       }
 
       case 'closed': {
+        const patchDocumentResponse: IPatchDocumentResponse = closedPatchDocument(
+          envInputs
+        )
+
+        // if success and patch document is not empty, then go update the work item
+        if (
+          patchDocumentResponse.success &&
+          patchDocumentResponse !== undefined
+        ) {
+          const closedResult = await update(
+            envInputs,
+            workItemId,
+            patchDocumentResponse.patchDocument
+          )
+
+          if (debug) console.log(closedResult)
+        }
+
         break
       }
     }

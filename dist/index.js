@@ -6901,6 +6901,7 @@ function getWebHookPayLoad() {
     vm.repo_fullname = ((_f = body.repository) === null || _f === void 0 ? void 0 : _f.full_name) !== undefined ? body.repository.full_name : '';
     vm.repo_owner = ((_g = body.repository) === null || _g === void 0 ? void 0 : _g.owner) !== undefined ? body.repository.owner.login : '';
     vm.body = ((_h = body.pull_request) === null || _h === void 0 ? void 0 : _h.body) !== undefined ? (_j = body.pull_request) === null || _j === void 0 ? void 0 : _j.body : '';
+    vm.body = vm.body.replace("/r/n", "<br>");
     return vm;
 }
 function run() {
@@ -6979,6 +6980,14 @@ function run() {
                     break;
                 }
                 case 'closed': {
+                    const patchDocumentResponse = patch_documents_1.closedPatchDocument(envInputs);
+                    // if success and patch document is not empty, then go update the work item
+                    if (patchDocumentResponse.success &&
+                        patchDocumentResponse !== undefined) {
+                        const closedResult = yield workitems_1.update(envInputs, workItemId, patchDocumentResponse.patchDocument);
+                        if (debug)
+                            console.log(closedResult);
+                    }
                     break;
                 }
             }
@@ -18785,8 +18794,26 @@ function editedPatchDocument(env, payload, workItem) {
     return response;
 }
 exports.editedPatchDocument = editedPatchDocument;
-function closedPatchDocument() {
-    return '';
+function closedPatchDocument(env) {
+    const response = {
+        code: 500,
+        message: 'failed',
+        success: false,
+        patchDocument: undefined
+    };
+    let patchDocument = [];
+    patchDocument = [
+        {
+            op: 'add',
+            path: '/fields/System.State',
+            value: env.ado_close_state
+        }
+    ];
+    response.code = 200;
+    response.message = 'Success';
+    response.success = true;
+    response.patchDocument = patchDocument;
+    return response;
 }
 exports.closedPatchDocument = closedPatchDocument;
 //# sourceMappingURL=patch-documents.js.map

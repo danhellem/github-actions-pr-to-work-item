@@ -63,8 +63,30 @@ export function editedPatchDocument(
   return response
 }
 
-export function closedPatchDocument(): string {
-  return ''
+export function closedPatchDocument(env: EnvInputs): IPatchDocumentResponse {
+  const response: IPatchDocumentResponse = {
+    code: 500,
+    message: 'failed',
+    success: false,
+    patchDocument: undefined
+  }
+
+  let patchDocument: JsonPatchDocument = []
+
+  patchDocument = [
+    {
+      op: 'add',
+      path: '/fields/System.State',
+      value: env.ado_close_state
+    }
+  ]
+
+  response.code = 200
+  response.message = 'Success'
+  response.success = true
+  response.patchDocument = patchDocument
+
+  return response
 }
 
 export interface IPatchDocumentResponse extends IResponse {
