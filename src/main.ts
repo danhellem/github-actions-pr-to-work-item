@@ -11,7 +11,7 @@ import {update as updatePr} from './github-pr'
 import {IResponse} from './interfaces/base-response'
 import * as patch from './patch-documents'
 
-const debug = true
+const debug = false
 const ado_org = ''
 const ado_project = ''
 const ado_token = ''
@@ -69,7 +69,8 @@ async function run(): Promise<void> {
     if (debug) console.log(payload)
 
     if (payload.sender_login === 'azure-boards[bot]') {
-      console.log('azure-boards[bot] sender, exiting action')
+      console.log(`azure-boards[bot] sender, exiting action`)
+      return
     }
 
     // go and see if the ado work item already exists for this PR

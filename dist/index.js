@@ -6870,7 +6870,7 @@ const sample_webhookpayload_1 = __importDefault(__webpack_require__(78));
 const workitems_1 = __webpack_require__(445);
 const github_pr_1 = __webpack_require__(515);
 const patch = __importStar(__webpack_require__(286));
-const debug = true;
+const debug = false;
 const ado_org = '';
 const ado_project = '';
 const ado_token = '';
@@ -6922,7 +6922,8 @@ function run() {
             if (debug)
                 console.log(payload);
             if (payload.sender_login === 'azure-boards[bot]') {
-                console.log('azure-boards[bot] sender, exiting action');
+                console.log(`azure-boards[bot] sender, exiting action`);
+                return;
             }
             // go and see if the ado work item already exists for this PR
             const fetchResult = yield workitems_1.fetch(envInputs, payload);
@@ -18776,7 +18777,7 @@ function openedPatchDocument(env) {
     const response = {
         code: 200,
         message: 'Success',
-        success: false,
+        success: true,
         patchDocument: undefined
     };
     let patchDocument = [];

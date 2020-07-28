@@ -9,7 +9,7 @@ export function openedPatchDocument(env: EnvInputs): IPatchDocumentResponse {
   const response: IPatchDocumentResponse = {
     code: 200,
     message: 'Success',
-    success: false,
+    success: true,
     patchDocument: undefined
   }
 
