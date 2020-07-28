@@ -1,101 +1,52 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
-</p>
+# Sync GitHub Pull Requests to Azure DevOps
 
-# Create a JavaScript Action using TypeScript
+Create a Pull Request in GitHub and have that Pull Request show up on Azure Boards
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+Update the Pull Request description will update the Pull Request in Azure Boards
 
-This template includes compilication support, tests, a validation workflow, publishing, and versioning guidance.  
+Completee the Pull Request in GitHub will close the Pull Request in Azure DevOps
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+## Outputs
+The id of the work item created or update
 
-## Create an action from this template
+## Example usage
 
-Click the `Use this Template` and provide the new repo details for your action
+1. Add a secret named `ADO_PERSONAL_ACCESS_TOKEN` containing an [Azure Personal Access Token](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate) with "read & write" permission for Work Items
 
-## Code in Master
+2. Add an optional secret named `GH_PERSONAL_ACCESS_TOKEN` containing a [GitHub Personal Access Token](https://help.github.com/en/enterprise/2.17/user/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) with "repo" permissions. See optional information below.
 
-Install the dependencies  
-```bash
-$ npm install
-```
+3. Install the [Azure Boards App](https://github.com/marketplace/azure-boards) from the GitHub Marketplace
 
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run pack
-```
+4. Add a workflow file which responds to pull request events of `oepned, edited, closed`
 
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
+   - Set Azure DevOps organization and project details.
+   - Set specific work item type settings (work item type, new state, active state, closed state)
 
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
+   Optional Env Variables
 
-...
-```
-
-## Change action.yml
-
-The action.yml contains defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run pack
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml)])
+   - `github_token`: Used to update the Issue with AB# syntax to link the work item to the issue. This will only work if the project is configured to use the [GitHub Azure Boards](https://github.com/marketplace/azure-boards) app.
 
 ```yaml
-uses: ./
-with:
-  milliseconds: 1000
+name: Sync Pull Request to Azure Boards
+
+on:
+  pull_request:
+    types: [opened, edited, closed]
+    branches:
+      - master
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: danhellem/github-actions-pr-to-work-item@master
+        env:
+          ado_token: '${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}'   
+        github_token: '${{ secrets.GH_TOKEN }}'    
+        ado_organization: 'privatepreview'
+        ado_project: 'Agile'
+        ado_wit: 'Pull Request' 
+        ado_new_state: 'New'
+        ado_active_state: 'Active'
+        ado_close_state: 'Closed'
 ```
-
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
-
-## Usage:
-
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
