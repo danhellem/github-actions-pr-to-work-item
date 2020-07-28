@@ -1,3 +1,5 @@
+![build-test](https://github.com/danhellem/github-actions-pr-to-work-item/workflows/build-test/badge.svg?branch=master)
+
 # Sync GitHub Pull Requests to Azure DevOps
 
 Create a Pull Request in GitHub and have that Pull Request show up on Azure Boards
