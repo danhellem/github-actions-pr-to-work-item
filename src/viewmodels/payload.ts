@@ -10,6 +10,7 @@ export default class Payload {
     this.repo_url = ''
     this.repo_owner = ''
     this.body = ''
+    this.sender_login = ''
   }
 
   action: string
@@ -22,4 +23,5 @@ export default class Payload {
   repo_url: string
   repo_owner: string
   body: string
+  sender_login: string
 }

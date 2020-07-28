@@ -7,8 +7,8 @@ import {IResponse} from './interfaces/base-response'
 
 export function openedPatchDocument(env: EnvInputs): IPatchDocumentResponse {
   const response: IPatchDocumentResponse = {
-    code: 500,
-    message: 'failed',
+    code: 200,
+    message: 'Success',
     success: false,
     patchDocument: undefined
   }
@@ -23,9 +23,6 @@ export function openedPatchDocument(env: EnvInputs): IPatchDocumentResponse {
     }
   ]
 
-  response.code = 200
-  response.message = 'Success'
-  response.success = true
   response.patchDocument = patchDocument
 
   return response

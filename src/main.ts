@@ -11,7 +11,7 @@ import {update as updatePr} from './github-pr'
 import {IResponse} from './interfaces/base-response'
 import * as patch from './patch-documents'
 
-const debug = false
+const debug = true
 const ado_org = ''
 const ado_project = ''
 const ado_token = ''
@@ -47,6 +47,7 @@ function getWebHookPayLoad(): Payload {
   vm.repo_url = body.repository?.html_url !== undefined ? body.repository.html_url : ''
   vm.repo_fullname = body.repository?.full_name !== undefined ? body.repository.full_name : ''
   vm.repo_owner = body.repository?.owner !== undefined ? body.repository.owner.login : ''
+  vm.sender_login = body.sender?.login !== undefined ? body.sender.login : ''
   vm.body = body.pull_request?.body !== undefined ? body.pull_request?.body : ''
 
   vm.body = vm.body.replace(new RegExp('\\r?\\n','g'), '<br />')
@@ -66,6 +67,10 @@ async function run(): Promise<void> {
     // get payload info
     const payload: Payload = getWebHookPayLoad()
     if (debug) console.log(payload)
+
+    if (payload.sender_login === 'azure-boards[bot]') {
+      console.log('azure-boards[bot] sender, exiting action')
+    }
 
     // go and see if the ado work item already exists for this PR
     const fetchResult = await fetch(envInputs, payload)
