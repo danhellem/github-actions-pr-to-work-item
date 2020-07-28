@@ -9,11 +9,7 @@ import sampleWebHookPayload from './debug/sample.webhookpayload'
 import {fetch, create, update} from './workitems'
 import {update as updatePr} from './github-pr'
 import {IResponse} from './interfaces/base-response'
-import {
-  IPatchDocumentResponse,
-  editedPatchDocument,
-  closedPatchDocument
-} from './patch-documents'
+import * as patch from './patch-documents'
 
 const debug = false
 const ado_org = ''
@@ -31,6 +27,7 @@ function getEnvInputs(): EnvInputs {
   vm.ado_project = process.env['ado_project'] !== undefined ? process.env['ado_project'] : ado_project
   vm.ado_wit = process.env['ado_wit'] !== undefined ? process.env['ado_wit'] : ado_wit
   vm.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : 'Closed'
+  vm.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active'
   vm.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token
 
   return vm
@@ -62,12 +59,15 @@ async function run(): Promise<void> {
     let workItem: WorkItem | null
     let workItemId: number
 
+    // set the env params
     const envInputs: EnvInputs = getEnvInputs()
     if (debug) console.log(envInputs)
 
+    // get payload info
     const payload: Payload = getWebHookPayLoad()
     if (debug) console.log(payload)
 
+    // go and see if the ado work item already exists for this PR
     const fetchResult = await fetch(envInputs, payload)
     if (debug) console.log(fetchResult)
 
@@ -88,8 +88,9 @@ async function run(): Promise<void> {
 
     // if a work item is not found then lets go create one
     if (fetchResult.code === 404) {
-      //create work item
+      // create work item
       const createResult = await create(envInputs, payload)
+
       if (debug) console.log(createResult)
 
       // if we successfully created the work item, then go and
@@ -133,11 +134,30 @@ async function run(): Promise<void> {
     // check the action type and go do specific updates
     switch (payload.action) {
       case 'opened': {
+        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.openedPatchDocument(
+          envInputs
+        )
+
+        // go update the work item to change the state
+        // this gets the PR out of the new column and into something more actionable
+        if (
+          patchDocumentResponse.success &&
+          patchDocumentResponse !== undefined
+        ) {
+          const openedResult = await update(
+            envInputs,
+            workItemId,
+            patchDocumentResponse.patchDocument
+          )
+
+          if (debug) console.log(openedResult)
+        }
+
         break
       }
 
       case 'edited': {
-        const patchDocumentResponse: IPatchDocumentResponse = editedPatchDocument(
+        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.editedPatchDocument(
           envInputs,
           payload,
           workItem
@@ -161,7 +181,7 @@ async function run(): Promise<void> {
       }
 
       case 'closed': {
-        const patchDocumentResponse: IPatchDocumentResponse = closedPatchDocument(
+        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.closedPatchDocument(
           envInputs
         )
 
