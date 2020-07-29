@@ -8,6 +8,8 @@ Update the Pull Request description will update the Pull Request in Azure Boards
 
 Completee the Pull Request in GitHub will close the Pull Request in Azure DevOps
 
+![alt text](./misc/pr-to-azure-boards.gif "animated demo")
+
 ## Outputs
 The id of the work item created or update
 
