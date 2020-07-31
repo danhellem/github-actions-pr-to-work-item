@@ -6,7 +6,7 @@ Create a Pull Request in GitHub and have that Pull Request show up on Azure Boar
 
 Update the Pull Request description will update the Pull Request in Azure Boards
 
-Completee the Pull Request in GitHub will close the Pull Request in Azure DevOps
+Complete the Pull Request in GitHub will close the Pull Request in Azure DevOps
 
 ![alt text](./misc/pr-to-azure-boards.gif "animated demo")
 
