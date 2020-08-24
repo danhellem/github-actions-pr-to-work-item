@@ -21,7 +21,7 @@ The id of the work item created or update
 
 3. Install the [Azure Boards App](https://github.com/marketplace/azure-boards) from the GitHub Marketplace
 
-4. Add a workflow file which responds to pull request events of `oepned, edited, closed`
+4. Add a workflow file which responds to pull request events of `opened, edited, closed`
 
    - Set Azure DevOps organization and project details.
    - Set specific work item type settings (work item type, new state, active state, closed state)
@@ -43,9 +43,9 @@ jobs:
   alert:
     runs-on: ubuntu-latest
     steps:
-      - uses: danhellem/github-actions-pr-to-work-item@master
-        env:
-          ado_token: '${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}'   
+    - uses: danhellem/github-actions-pr-to-work-item@master
+      env:
+        ado_token: '${{ secrets.ADO_PERSONAL_ACCESS_TOKEN }}'   
         github_token: '${{ secrets.GH_TOKEN }}'    
         ado_organization: 'privatepreview'
         ado_project: 'Agile'
