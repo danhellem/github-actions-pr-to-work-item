@@ -53,4 +53,5 @@ jobs:
         ado_new_state: 'New'
         ado_active_state: 'Active'
         ado_close_state: 'Closed'
+        ado_area_path: 'optional_area_path\\optional_area_path'
 ```
