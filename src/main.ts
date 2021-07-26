@@ -16,7 +16,9 @@ const ado_org = ''
 const ado_project = ''
 const ado_token = ''
 const ado_wit = 'Pull Request'
+const ado_area_path = ''
 const github_token = ''
+
 
 // prettier-ignore
 function getEnvInputs(): EnvInputs {
@@ -29,6 +31,7 @@ function getEnvInputs(): EnvInputs {
   vm.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : 'Closed'
   vm.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active'
   vm.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token
+  vm.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path
 
   return vm
 }

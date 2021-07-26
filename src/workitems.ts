@@ -111,7 +111,7 @@ export async function create(
   }
 
   // prettier-ignore
-  const patchDocument: JsonPatchDocument = [
+  const patchDocument: JsonPatchDocument | any = [
     {
       op: 'add',
       path: '/fields/System.Title',
@@ -141,6 +141,14 @@ export async function create(
       }
     }
   ]
+
+  if (env.ado_area_path != "") {
+    patchDocument.push({
+      op: "add",
+      path: "/fields/System.AreaPath",
+      value: env.ado_area_path
+    });
+  }
 
   const authHandler = azdev.getPersonalAccessTokenHandler(env.ado_token)
   const connection = new azdev.WebApi(
