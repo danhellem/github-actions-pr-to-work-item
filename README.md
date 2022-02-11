@@ -29,12 +29,13 @@ The id of the work item created or update
    Optional Env Variables
 
    - `github_token`: Used to update the Issue with AB# syntax to link the work item to the issue. This will only work if the project is configured to use the [GitHub Azure Boards](https://github.com/marketplace/azure-boards) app.
+   - `debug`: Used for more verbose log output.
 
 ```yaml
 name: Sync Pull Request to Azure Boards
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, edited, closed]
     branches:
       - master
@@ -49,8 +50,7 @@ jobs:
         github_token: '${{ secrets.GH_TOKEN }}'    
         ado_organization: 'privatepreview'
         ado_project: 'Agile'
-        ado_wit: 'Pull Request' 
-        ado_new_state: 'New'
+        ado_wit: 'Pull Request'
         ado_active_state: 'Active'
         ado_close_state: 'Closed'
         ado_area_path: 'optional_area_path\\optional_area_path'

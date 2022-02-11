@@ -91,7 +91,7 @@ export async function fetch(
 
     return response
   } catch (ex) {
-    response.message.concat(JSON.stringify(ex))
+    response.message = response.message.concat(JSON.stringify(ex))
     response.workItem = null
     response.success = false
 
@@ -183,7 +183,7 @@ export async function create(
 
     return response
   } catch (ex) {
-    response.message.concat(JSON.stringify(ex))
+    response.message = response.message.concat(JSON.stringify(ex))
     response.workItem = null
     response.success = false
 
@@ -240,7 +240,7 @@ export async function update(
 
     return response
   } catch (ex) {
-    response.message.concat(JSON.stringify(ex))
+    response.message = response.message.concat(JSON.stringify(ex))
     response.workItem = null
     response.success = false
 
