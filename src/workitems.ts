@@ -142,12 +142,12 @@ export async function create(
     }
   ]
 
-  if (env.ado_area_path != "") {
+  if (env.ado_area_path !== '') {
     patchDocument.push({
-      op: "add",
-      path: "/fields/System.AreaPath",
+      op: 'add',
+      path: '/fields/System.AreaPath',
       value: env.ado_area_path
-    });
+    })
   }
 
   const authHandler = azdev.getPersonalAccessTokenHandler(env.ado_token)

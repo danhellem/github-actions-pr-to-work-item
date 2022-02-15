@@ -7028,7 +7028,9 @@ function run() {
                     console.log('  create successfull');
                     workItem = createResult.workItem;
                     workItemId = ((_a = workItem) === null || _a === void 0 ? void 0 : _a.id) !== undefined ? (_b = workItem) === null || _b === void 0 ? void 0 : _b.id : -1;
-                    const pr = envInputs.github_token !== '' ? yield github_pr_1.update(payload, envInputs.github_token, ((_c = workItem) === null || _c === void 0 ? void 0 : _c.id) !== undefined ? workItem.id : -1) : response;
+                    const pr = envInputs.github_token !== ''
+                        ? yield github_pr_1.update(payload, envInputs.github_token, ((_c = workItem) === null || _c === void 0 ? void 0 : _c.id) !== undefined ? workItem.id : -1)
+                        : response;
                     if (debug)
                         console.log(pr);
                     if (!pr.success)
@@ -7056,7 +7058,8 @@ function run() {
                     const patchDocumentResponse = patch.openedPatchDocument(envInputs);
                     // go update the work item to change the state
                     // this gets the PR out of the new column and into something more actionable
-                    if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
+                    if (patchDocumentResponse.success &&
+                        patchDocumentResponse !== undefined) {
                         const openedResult = yield workitems_1.update(envInputs, workItemId, patchDocumentResponse.patchDocument);
                         if (debug)
                             console.log(openedResult);
@@ -7066,7 +7069,8 @@ function run() {
                 case 'edited': {
                     const patchDocumentResponse = patch.editedPatchDocument(envInputs, payload, workItem);
                     // if success and patch document is not empty, then go update the work item
-                    if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
+                    if (patchDocumentResponse.success &&
+                        patchDocumentResponse !== undefined) {
                         const updateResult = yield workitems_1.update(envInputs, workItemId, patchDocumentResponse.patchDocument);
                         if (debug)
                             console.log(updateResult);
@@ -7076,7 +7080,8 @@ function run() {
                 case 'closed': {
                     const patchDocumentResponse = patch.closedPatchDocument(envInputs, payload);
                     // if success and patch document is not empty, then go update the work item
-                    if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
+                    if (patchDocumentResponse.success &&
+                        patchDocumentResponse !== undefined) {
                         const closedResult = yield workitems_1.update(envInputs, workItemId, patchDocumentResponse.patchDocument);
                         if (debug)
                             console.log(closedResult);
@@ -18846,7 +18851,12 @@ function register (state, name, method, options) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 function openedPatchDocument(env) {
-    const response = { code: 200, message: 'Success', success: true, patchDocument: undefined };
+    const response = {
+        code: 200,
+        message: 'Success',
+        success: true,
+        patchDocument: undefined
+    };
     let patchDocument = [];
     patchDocument = [
         {
@@ -18860,10 +18870,19 @@ function openedPatchDocument(env) {
 }
 exports.openedPatchDocument = openedPatchDocument;
 function editedPatchDocument(env, payload, workItem) {
-    const response = { code: 500, message: 'failed', success: false, patchDocument: undefined };
+    const response = {
+        code: 500,
+        message: 'failed',
+        success: false,
+        patchDocument: undefined
+    };
     let patchDocument = [];
-    const system_title = workItem.fields ? workItem.fields['System.Title'] : '';
-    const system_description = workItem.fields ? workItem.fields['System.Description'] : '';
+    const system_title = workItem.fields
+        ? workItem.fields['System.Title']
+        : '';
+    const system_description = workItem.fields
+        ? workItem.fields['System.Description']
+        : '';
     payload.body = payload.body.replace(`\r\nAB#${workItem.id}`, '');
     const pr_title = `${payload.title} (GitHub PR #${payload.number})`;
     const pr_desc = `${payload.body.trim()}<br><br>GitHub <a href="${payload.url}">Pull Request #${payload.number}</a> created in <a href="${payload.repo_url}">${payload.repo_fullname}</a>`;
@@ -18894,7 +18913,12 @@ function editedPatchDocument(env, payload, workItem) {
 }
 exports.editedPatchDocument = editedPatchDocument;
 function closedPatchDocument(env, payload) {
-    const response = { code: 500, message: 'failed', success: false, patchDocument: undefined };
+    const response = {
+        code: 500,
+        message: 'failed',
+        success: false,
+        patchDocument: undefined
+    };
     const pr_desc = `GitHub <a href="${payload.url}">Pull Request #${payload.number}</a> was closed`;
     let patchDocument = [];
     patchDocument = [
@@ -33659,10 +33683,10 @@ function create(env, payload) {
                 }
             }
         ];
-        if (env.ado_area_path != "") {
+        if (env.ado_area_path !== '') {
             patchDocument.push({
-                op: "add",
-                path: "/fields/System.AreaPath",
+                op: 'add',
+                path: '/fields/System.AreaPath',
                 value: env.ado_area_path
             });
         }
