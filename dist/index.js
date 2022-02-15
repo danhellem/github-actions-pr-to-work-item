@@ -3034,16 +3034,16 @@ exports.TaskAgentApi = TaskAgentApi;
 Object.defineProperty(exports, "__esModule", { value: true });
 const sampleWebHookPayload = {
     action: 'opened',
-    number: 10,
+    number: 14,
     pull_request: {
-        url: 'https://api.github.com/repos/danhellem/myapp-web/pulls/10',
+        url: 'https://api.github.com/repos/danhellem/myapp-web/pulls/14',
         id: 847975880,
         node_id: 'MDExOlB1bGxSZXF1ZXN0NDE0MjA1NTg1',
-        html_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10',
-        diff_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10.diff',
-        patch_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10.patch',
-        issue_url: 'https://api.github.com/repos/danhellem/myapp-web/issues/10',
-        number: 10,
+        html_url: 'https://github.com/danhellem/Lorem-ipsum/pull/14',
+        diff_url: 'https://github.com/danhellem/Lorem-ipsum/pull/14.diff',
+        patch_url: 'https://github.com/danhellem/Lorem-ipsum/pull/14.patch',
+        issue_url: 'https://api.github.com/repos/danhellem/myapp-web/issues/14',
+        number: 14,
         state: 'open',
         locked: false,
         title: 'Update README.md',
@@ -3136,7 +3136,7 @@ const sampleWebHookPayload = {
                     site_admin: true
                 },
                 html_url: 'https://github.com/danhellem/Lorem-ipsum',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+                description: null,
                 fork: false,
                 url: 'https://api.github.com/repos/danhellem/Lorem-ipsum',
                 forks_url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/forks',
@@ -3261,7 +3261,7 @@ const sampleWebHookPayload = {
                     site_admin: true
                 },
                 html_url: 'https://github.com/danhellem/Lorem-ipsum',
-                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+                description: null,
                 fork: false,
                 url: 'https://api.github.com/repos/danhellem/Lorem-ipsum',
                 forks_url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/forks',
@@ -3402,7 +3402,7 @@ const sampleWebHookPayload = {
             site_admin: true
         },
         html_url: 'https://github.com/danhellem/Lorem-ipsum',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+        description: null,
         fork: false,
         url: 'https://api.github.com/repos/danhellem/Lorem-ipsum',
         forks_url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/forks',
@@ -6932,7 +6932,7 @@ let debug = false;
 const ado_org = '';
 const ado_project = '';
 const ado_token = '';
-const ado_wit = 'GitHub Pull Request';
+const ado_wit = '';
 const ado_area_path = '';
 const github_token = '';
 // prettier-ignore
@@ -6946,7 +6946,8 @@ function getEnvInputs() {
     env.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active';
     env.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token;
     env.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path;
-    debug = process.env['debug'] !== undefined ? true : false;
+    if (!debug)
+        debug = process.env['debug'] !== undefined ? true : false;
     if (!env.ado_token) {
         console.log('  Missing ado_token value');
     }
@@ -6979,8 +6980,8 @@ function getWebHookPayLoad() {
     payload.repo_fullname = ((_f = body.repository) === null || _f === void 0 ? void 0 : _f.full_name) !== undefined ? body.repository.full_name : '';
     payload.repo_owner = ((_g = body.repository) === null || _g === void 0 ? void 0 : _g.owner) !== undefined ? body.repository.owner.login : '';
     payload.sender_login = ((_h = body.sender) === null || _h === void 0 ? void 0 : _h.login) !== undefined ? body.sender.login : '';
-    payload.body = (((_j = body.pull_request) === null || _j === void 0 ? void 0 : _j.body) !== undefined || ((_k = body.pull_request) === null || _k === void 0 ? void 0 : _k.body) !== null) ? (_l = body.pull_request) === null || _l === void 0 ? void 0 : _l.body : '';
-    payload.body = (payload.body !== undefined) ? payload.body.replace(new RegExp('\\r?\\n', 'g'), '<br />') : '';
+    let request_body = (((_j = body.pull_request) === null || _j === void 0 ? void 0 : _j.body) !== undefined || ((_k = body.pull_request) === null || _k === void 0 ? void 0 : _k.body) !== null) ? (_l = body.pull_request) === null || _l === void 0 ? void 0 : _l.body : '';
+    payload.body = (request_body !== null) ? request_body.replace(new RegExp('\\r?\\n', 'g'), '<br />') : '';
     return payload;
 }
 function run() {

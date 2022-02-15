@@ -15,7 +15,7 @@ let debug = false
 const ado_org = ''
 const ado_project = ''
 const ado_token = ''
-const ado_wit = 'GitHub Pull Request'
+const ado_wit = ''
 const ado_area_path = ''
 const github_token = ''
 
@@ -30,8 +30,8 @@ function getEnvInputs(): EnvInputs {
   env.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : 'Closed'
   env.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active'
   env.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token
-  env.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path
-  debug = process.env['debug'] !== undefined ? true : false
+  env.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path  
+  if (! debug) debug = process.env['debug'] !== undefined ? true : false
 
   if (!env.ado_token) { console.log('  Missing ado_token value') } 
   if (!env.ado_organization) { console.log('  Missing ado_organization value') } 
@@ -45,7 +45,7 @@ function getEnvInputs(): EnvInputs {
 // prettier-ignore
 function getWebHookPayLoad(): Payload {
   const body: WebhookPayload = (context !== undefined && !debug) ? context.payload : sampleWebHookPayload
-  const payload: Payload = new Payload()
+  const payload: Payload = new Payload()  
 
   payload.action = body.action !== undefined ? body.action : ''
   payload.number = body.pull_request?.number !== undefined ? body.pull_request?.number : -1
@@ -57,8 +57,9 @@ function getWebHookPayLoad(): Payload {
   payload.repo_fullname = body.repository?.full_name !== undefined ? body.repository.full_name : ''
   payload.repo_owner = body.repository?.owner !== undefined ? body.repository.owner.login : ''
   payload.sender_login = body.sender?.login !== undefined ? body.sender.login : ''
-  payload.body = (body.pull_request?.body !== undefined || body.pull_request?.body !== null) ? body.pull_request?.body : ''
-  payload.body = (payload.body !== undefined) ? payload.body.replace(new RegExp('\\r?\\n','g'), '<br />') : ''
+  
+  let request_body: string = (body.pull_request?.body !== undefined || body.pull_request?.body !== null) ? body.pull_request?.body : ''
+  payload.body = (request_body !== null) ? request_body.replace(new RegExp('\\r?\\n','g'), '<br />') : ''
 
   return payload
 }
