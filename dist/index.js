@@ -18903,7 +18903,7 @@ function editedPatchDocument(env, payload, workItem) {
         },
         {
             op: 'add',
-            path: '/fields/System.History',
+            path: '/fields/System.Description',
             value: pr_desc
         }
     ];
@@ -18921,7 +18921,7 @@ function closedPatchDocument(env, payload) {
         success: false,
         patchDocument: undefined
     };
-    const pr_desc = `GitHub <a href="${payload.url}">Pull Request #${payload.number}</a> was closed`;
+    const pr_comment = `GitHub <a href="${payload.url}">Pull Request #${payload.number}</a> was closed`;
     let patchDocument = [];
     patchDocument = [
         {
@@ -18931,8 +18931,8 @@ function closedPatchDocument(env, payload) {
         },
         {
             op: 'add',
-            path: '/fields/System.Description',
-            value: pr_desc
+            path: '/fields/System.History',
+            value: pr_comment
         }
     ];
     response.code = 200;
