@@ -6,14 +6,9 @@ import Payload from './viewmodels/payload'
 import {IResponse} from './interfaces/base-response'
 
 export function openedPatchDocument(env: EnvInputs): IPatchDocumentResponse {
-  const response: IPatchDocumentResponse = {
-    code: 200,
-    message: 'Success',
-    success: true,
-    patchDocument: undefined
-  }
+  const response: IPatchDocumentResponse = { code: 200, message: 'Success', success: true, patchDocument: undefined };
 
-  let patchDocument: JsonPatchDocument = []
+  let patchDocument: JsonPatchDocument = [];
 
   patchDocument = [
     {
@@ -23,48 +18,31 @@ export function openedPatchDocument(env: EnvInputs): IPatchDocumentResponse {
     }
   ]
 
-  response.patchDocument = patchDocument
+  response.patchDocument = patchDocument;
 
   return response
 }
 
-export function editedPatchDocument(
-  env: EnvInputs,
-  payload: Payload,
-  workItem: WorkItem
-): IPatchDocumentResponse {
-  const response: IPatchDocumentResponse = {
-    code: 500,
-    message: 'failed',
-    success: false,
-    patchDocument: undefined
-  }
+export function editedPatchDocument(env: EnvInputs, payload: Payload, workItem: WorkItem): IPatchDocumentResponse {
+  const response: IPatchDocumentResponse = { code: 500, message: 'failed', success: false, patchDocument: undefined };
 
-  let patchDocument: JsonPatchDocument = []
+  let patchDocument: JsonPatchDocument = [];
 
-  const system_title: string = workItem.fields
-    ? workItem.fields['System.Title']
-    : ''
-  const system_description: string = workItem.fields
-    ? workItem.fields['System.Description']
-    : ''
+  const system_title: string = workItem.fields ? workItem.fields['System.Title'] : '';
+  const system_description: string = workItem.fields ? workItem.fields['System.Description'] : '';
 
-  payload.body = payload.body.replace(`\r\nAB#${workItem.id}`, '')
+  payload.body = payload.body.replace(`\r\nAB#${workItem.id}`, '');
 
-  const pr_title = `${payload.title} (GitHub PR #${payload.number})`
-  const pr_desc = `${payload.body.trim()}<br><br>GitHub <a href="${
-    payload.url
-  }">Pull Request #${payload.number}</a> created in <a href="${
-    payload.repo_url
-  }">${payload.repo_fullname}</a>`
+  const pr_title = `${payload.title} (GitHub PR #${payload.number})`;
+  const pr_desc = `${payload.body.trim()}<br><br>GitHub <a href="${payload.url}">Pull Request #${payload.number}</a> created in <a href="${payload.repo_url}">${payload.repo_fullname}</a>`;
 
   if (system_title === pr_title && system_description === pr_desc) {
-    response.code = 200
-    response.message = 'No updates made to work item title or description'
-    response.success = true
-    response.patchDocument = undefined
+    response.code = 200;
+    response.message = 'No updates made to work item title or description';
+    response.success = true;
+    response.patchDocument = undefined;
 
-    return response
+    return response;
   }
 
   patchDocument = [
@@ -75,43 +53,45 @@ export function editedPatchDocument(
     },
     {
       op: 'add',
-      path: '/fields/System.Description',
+      path: '/fields/System.History',
       value: pr_desc
     }
   ]
 
-  response.code = 200
-  response.message = 'Success'
-  response.success = true
-  response.patchDocument = patchDocument
+  response.code = 200;
+  response.message = 'Success';
+  response.success = true;
+  response.patchDocument = patchDocument;
 
-  return response
+  return response;
 }
 
-export function closedPatchDocument(env: EnvInputs): IPatchDocumentResponse {
-  const response: IPatchDocumentResponse = {
-    code: 500,
-    message: 'failed',
-    success: false,
-    patchDocument: undefined
-  }
+export function closedPatchDocument(env: EnvInputs, payload: Payload): IPatchDocumentResponse {
+  const response: IPatchDocumentResponse = { code: 500, message: 'failed', success: false, patchDocument: undefined };
 
-  let patchDocument: JsonPatchDocument = []
+  const pr_desc = `GitHub <a href="${payload.url}">Pull Request #${payload.number}</a> was closed`;
+
+  let patchDocument: JsonPatchDocument = [];
 
   patchDocument = [
     {
       op: 'add',
       path: '/fields/System.State',
       value: env.ado_close_state
+    },
+    {
+      op: 'add',
+      path: '/fields/System.Description',
+      value: pr_desc
     }
   ]
 
-  response.code = 200
-  response.message = 'Success'
-  response.success = true
-  response.patchDocument = patchDocument
+  response.code = 200;
+  response.message = 'Success';
+  response.success = true;
+  response.patchDocument = patchDocument;
 
-  return response
+  return response;
 }
 
 export interface IPatchDocumentResponse extends IResponse {

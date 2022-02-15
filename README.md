@@ -29,6 +29,7 @@ The id of the work item created or update
    Optional Env Variables
 
    - `github_token`: Used to update the Issue with AB# syntax to link the work item to the issue. This will only work if the project is configured to use the [GitHub Azure Boards](https://github.com/marketplace/azure-boards) app.
+   - `debug`: `true` for verbose logging to help debug problems. Remove this variable from the YAML file if you do not want to see verbose logging.
 
 ```yaml
 name: Sync Pull Request to Azure Boards

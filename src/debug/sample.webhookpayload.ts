@@ -2,16 +2,16 @@ import {WebhookPayload} from '@actions/github/lib/interfaces'
 
 const sampleWebHookPayload: WebhookPayload = {
   action: 'opened',
-  number: 6,
+  number: 10,
   pull_request: {
-    url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/pulls/6',
-    id: 414205585,
+    url: 'https://api.github.com/repos/danhellem/myapp-web/pulls/10',
+    id: 847975880,
     node_id: 'MDExOlB1bGxSZXF1ZXN0NDE0MjA1NTg1',
-    html_url: 'https://github.com/danhellem/Lorem-ipsum/pull/6',
-    diff_url: 'https://github.com/danhellem/Lorem-ipsum/pull/6.diff',
-    patch_url: 'https://github.com/danhellem/Lorem-ipsum/pull/6.patch',
-    issue_url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/issues/6',
-    number: 6,
+    html_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10',
+    diff_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10.diff',
+    patch_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10.patch',
+    issue_url: 'https://api.github.com/repos/danhellem/myapp-web/issues/10',
+    number: 10,
     state: 'open',
     locked: false,
     title: 'Update README.md',
@@ -38,8 +38,7 @@ const sampleWebHookPayload: WebhookPayload = {
       type: 'User',
       site_admin: true
     },
-    body:
-      'Simple comment\r\n\r\nhello world\r\nSimple comment\r\n\r\nhello world',
+    body: null,
     created_at: '2020-05-06T16:34:25Z',
     updated_at: '2020-05-06T16:34:25Z',
     closed_at: null,

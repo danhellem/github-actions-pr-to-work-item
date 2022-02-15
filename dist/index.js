@@ -3034,16 +3034,16 @@ exports.TaskAgentApi = TaskAgentApi;
 Object.defineProperty(exports, "__esModule", { value: true });
 const sampleWebHookPayload = {
     action: 'opened',
-    number: 6,
+    number: 10,
     pull_request: {
-        url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/pulls/6',
-        id: 414205585,
+        url: 'https://api.github.com/repos/danhellem/myapp-web/pulls/10',
+        id: 847975880,
         node_id: 'MDExOlB1bGxSZXF1ZXN0NDE0MjA1NTg1',
-        html_url: 'https://github.com/danhellem/Lorem-ipsum/pull/6',
-        diff_url: 'https://github.com/danhellem/Lorem-ipsum/pull/6.diff',
-        patch_url: 'https://github.com/danhellem/Lorem-ipsum/pull/6.patch',
-        issue_url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/issues/6',
-        number: 6,
+        html_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10',
+        diff_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10.diff',
+        patch_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10.patch',
+        issue_url: 'https://api.github.com/repos/danhellem/myapp-web/issues/10',
+        number: 10,
         state: 'open',
         locked: false,
         title: 'Update README.md',
@@ -3067,7 +3067,7 @@ const sampleWebHookPayload = {
             type: 'User',
             site_admin: true
         },
-        body: 'Simple comment\r\n\r\nhello world\r\nSimple comment\r\n\r\nhello world',
+        body: null,
         created_at: '2020-05-06T16:34:25Z',
         updated_at: '2020-05-06T16:34:25Z',
         closed_at: null,
@@ -6928,44 +6928,60 @@ const sample_webhookpayload_1 = __importDefault(__webpack_require__(78));
 const workitems_1 = __webpack_require__(445);
 const github_pr_1 = __webpack_require__(515);
 const patch = __importStar(__webpack_require__(286));
-const debug = false;
+let debug = false;
 const ado_org = '';
 const ado_project = '';
 const ado_token = '';
-const ado_wit = 'Pull Request';
+const ado_wit = 'GitHub Pull Request';
 const ado_area_path = '';
 const github_token = '';
 // prettier-ignore
 function getEnvInputs() {
-    const vm = new env_inputs_1.default();
-    vm.ado_token = process.env['ado_token'] !== undefined ? process.env['ado_token'] : ado_token;
-    vm.ado_organization = process.env['ado_organization'] !== undefined ? process.env['ado_organization'] : ado_org;
-    vm.ado_project = process.env['ado_project'] !== undefined ? process.env['ado_project'] : ado_project;
-    vm.ado_wit = process.env['ado_wit'] !== undefined ? process.env['ado_wit'] : ado_wit;
-    vm.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : 'Closed';
-    vm.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active';
-    vm.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token;
-    vm.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path;
-    return vm;
+    const env = new env_inputs_1.default();
+    env.ado_token = process.env['ado_token'] !== undefined ? process.env['ado_token'] : ado_token;
+    env.ado_organization = process.env['ado_organization'] !== undefined ? process.env['ado_organization'] : ado_org;
+    env.ado_project = process.env['ado_project'] !== undefined ? process.env['ado_project'] : ado_project;
+    env.ado_wit = process.env['ado_wit'] !== undefined ? process.env['ado_wit'] : ado_wit;
+    env.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : 'Closed';
+    env.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active';
+    env.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token;
+    env.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path;
+    debug = process.env['debug'] !== undefined ? true : false;
+    if (!env.ado_token) {
+        console.log('  Missing ado_token value');
+    }
+    if (!env.ado_organization) {
+        console.log('  Missing ado_organization value');
+    }
+    if (!env.ado_project) {
+        console.log('  Missing ado_project value');
+    }
+    if (!env.ado_wit) {
+        console.log('  Missing ado_wit value');
+    }
+    if (!env.github_token) {
+        console.log('  Missing github_token value');
+    }
+    return env;
 }
 // prettier-ignore
 function getWebHookPayLoad() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     const body = (github_1.context !== undefined && !debug) ? github_1.context.payload : sample_webhookpayload_1.default;
-    const vm = new payload_1.default();
-    vm.action = body.action !== undefined ? body.action : '';
-    vm.number = ((_a = body.pull_request) === null || _a === void 0 ? void 0 : _a.number) !== undefined ? (_b = body.pull_request) === null || _b === void 0 ? void 0 : _b.number : -1;
-    vm.title = body.pull_request !== undefined ? body.pull_request['title'] : '';
-    vm.url = ((_c = body.pull_request) === null || _c === void 0 ? void 0 : _c.html_url) !== undefined ? body.pull_request.html_url : '';
-    vm.merged = body['merged'] !== undefined ? body['merged'] : false;
-    vm.repo_name = ((_d = body.repository) === null || _d === void 0 ? void 0 : _d.name) !== undefined ? body.repository.name : '';
-    vm.repo_url = ((_e = body.repository) === null || _e === void 0 ? void 0 : _e.html_url) !== undefined ? body.repository.html_url : '';
-    vm.repo_fullname = ((_f = body.repository) === null || _f === void 0 ? void 0 : _f.full_name) !== undefined ? body.repository.full_name : '';
-    vm.repo_owner = ((_g = body.repository) === null || _g === void 0 ? void 0 : _g.owner) !== undefined ? body.repository.owner.login : '';
-    vm.sender_login = ((_h = body.sender) === null || _h === void 0 ? void 0 : _h.login) !== undefined ? body.sender.login : '';
-    vm.body = ((_j = body.pull_request) === null || _j === void 0 ? void 0 : _j.body) !== undefined ? (_k = body.pull_request) === null || _k === void 0 ? void 0 : _k.body : '';
-    vm.body = vm.body.replace(new RegExp('\\r?\\n', 'g'), '<br />');
-    return vm;
+    const payload = new payload_1.default();
+    payload.action = body.action !== undefined ? body.action : '';
+    payload.number = ((_a = body.pull_request) === null || _a === void 0 ? void 0 : _a.number) !== undefined ? (_b = body.pull_request) === null || _b === void 0 ? void 0 : _b.number : -1;
+    payload.title = body.pull_request !== undefined ? body.pull_request['title'] : '';
+    payload.url = ((_c = body.pull_request) === null || _c === void 0 ? void 0 : _c.html_url) !== undefined ? body.pull_request.html_url : '';
+    payload.merged = body['merged'] !== undefined ? body['merged'] : false;
+    payload.repo_name = ((_d = body.repository) === null || _d === void 0 ? void 0 : _d.name) !== undefined ? body.repository.name : '';
+    payload.repo_url = ((_e = body.repository) === null || _e === void 0 ? void 0 : _e.html_url) !== undefined ? body.repository.html_url : '';
+    payload.repo_fullname = ((_f = body.repository) === null || _f === void 0 ? void 0 : _f.full_name) !== undefined ? body.repository.full_name : '';
+    payload.repo_owner = ((_g = body.repository) === null || _g === void 0 ? void 0 : _g.owner) !== undefined ? body.repository.owner.login : '';
+    payload.sender_login = ((_h = body.sender) === null || _h === void 0 ? void 0 : _h.login) !== undefined ? body.sender.login : '';
+    payload.body = (((_j = body.pull_request) === null || _j === void 0 ? void 0 : _j.body) !== undefined || ((_k = body.pull_request) === null || _k === void 0 ? void 0 : _k.body) !== null) ? (_l = body.pull_request) === null || _l === void 0 ? void 0 : _l.body : '';
+    payload.body = (payload.body !== undefined) ? payload.body.replace(new RegExp('\\r?\\n', 'g'), '<br />') : '';
+    return payload;
 }
 function run() {
     var _a, _b, _c, _d, _e, _f;
@@ -6973,10 +6989,12 @@ function run() {
         try {
             let workItem;
             let workItemId;
+            console.log('Getting environmental variables...');
             // set the env params
             const envInputs = getEnvInputs();
             if (debug)
                 console.log(envInputs);
+            console.log('Getting payload values...');
             // get payload info
             const payload = getWebHookPayLoad();
             if (debug)
@@ -6985,15 +7003,12 @@ function run() {
                 console.log(`azure-boards[bot] sender, exiting action`);
                 return;
             }
+            console.log('Fetching id from work items...');
             // go and see if the ado work item already exists for this PR
             const fetchResult = yield workitems_1.fetch(envInputs, payload);
             if (debug)
                 console.log(fetchResult);
-            const response = {
-                code: 500,
-                message: 'failed',
-                success: false
-            };
+            const response = { code: 500, message: 'failed', success: false };
             // check to make sure your fetch was a success
             // success = return an work item or return a zero result
             if (!fetchResult.success) {
@@ -7002,6 +7017,7 @@ function run() {
             }
             // if a work item is not found then lets go create one
             if (fetchResult.code === 404) {
+                console.log('Work item does not exist, creating new one...');
                 // create work item
                 const createResult = yield workitems_1.create(envInputs, payload);
                 if (debug)
@@ -7009,11 +7025,10 @@ function run() {
                 // if we successfully created the work item, then go and
                 // link the PR in GitHub to the PR work item in ADO
                 if (createResult.success) {
+                    console.log('  create successfull');
                     workItem = createResult.workItem;
                     workItemId = ((_a = workItem) === null || _a === void 0 ? void 0 : _a.id) !== undefined ? (_b = workItem) === null || _b === void 0 ? void 0 : _b.id : -1;
-                    const pr = envInputs.github_token !== ''
-                        ? yield github_pr_1.update(payload, envInputs.github_token, ((_c = workItem) === null || _c === void 0 ? void 0 : _c.id) !== undefined ? workItem.id : -1)
-                        : response;
+                    const pr = envInputs.github_token !== '' ? yield github_pr_1.update(payload, envInputs.github_token, ((_c = workItem) === null || _c === void 0 ? void 0 : _c.id) !== undefined ? workItem.id : -1) : response;
                     if (debug)
                         console.log(pr);
                     if (!pr.success)
@@ -7027,7 +7042,7 @@ function run() {
             else {
                 workItem = fetchResult.workItem;
                 workItemId = ((_d = workItem) === null || _d === void 0 ? void 0 : _d.id) !== undefined ? (_e = workItem) === null || _e === void 0 ? void 0 : _e.id : -1;
-                console.log(`Existing work item found: ${(_f = workItem) === null || _f === void 0 ? void 0 : _f.id}`);
+                console.log(`  Existing work item found: ${(_f = workItem) === null || _f === void 0 ? void 0 : _f.id}`);
             }
             // for some reason workItem is still null
             // should never happen
@@ -7041,8 +7056,7 @@ function run() {
                     const patchDocumentResponse = patch.openedPatchDocument(envInputs);
                     // go update the work item to change the state
                     // this gets the PR out of the new column and into something more actionable
-                    if (patchDocumentResponse.success &&
-                        patchDocumentResponse !== undefined) {
+                    if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
                         const openedResult = yield workitems_1.update(envInputs, workItemId, patchDocumentResponse.patchDocument);
                         if (debug)
                             console.log(openedResult);
@@ -7052,8 +7066,7 @@ function run() {
                 case 'edited': {
                     const patchDocumentResponse = patch.editedPatchDocument(envInputs, payload, workItem);
                     // if success and patch document is not empty, then go update the work item
-                    if (patchDocumentResponse.success &&
-                        patchDocumentResponse !== undefined) {
+                    if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
                         const updateResult = yield workitems_1.update(envInputs, workItemId, patchDocumentResponse.patchDocument);
                         if (debug)
                             console.log(updateResult);
@@ -7061,10 +7074,9 @@ function run() {
                     break;
                 }
                 case 'closed': {
-                    const patchDocumentResponse = patch.closedPatchDocument(envInputs);
+                    const patchDocumentResponse = patch.closedPatchDocument(envInputs, payload);
                     // if success and patch document is not empty, then go update the work item
-                    if (patchDocumentResponse.success &&
-                        patchDocumentResponse !== undefined) {
+                    if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
                         const closedResult = yield workitems_1.update(envInputs, workItemId, patchDocumentResponse.patchDocument);
                         if (debug)
                             console.log(closedResult);
@@ -7073,8 +7085,8 @@ function run() {
                 }
             }
         }
-        catch (error) {
-            core.setFailed(error.message);
+        catch (err) {
+            core.setFailed(err.message);
         }
     });
 }
@@ -18834,12 +18846,7 @@ function register (state, name, method, options) {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 function openedPatchDocument(env) {
-    const response = {
-        code: 200,
-        message: 'Success',
-        success: true,
-        patchDocument: undefined
-    };
+    const response = { code: 200, message: 'Success', success: true, patchDocument: undefined };
     let patchDocument = [];
     patchDocument = [
         {
@@ -18853,19 +18860,10 @@ function openedPatchDocument(env) {
 }
 exports.openedPatchDocument = openedPatchDocument;
 function editedPatchDocument(env, payload, workItem) {
-    const response = {
-        code: 500,
-        message: 'failed',
-        success: false,
-        patchDocument: undefined
-    };
+    const response = { code: 500, message: 'failed', success: false, patchDocument: undefined };
     let patchDocument = [];
-    const system_title = workItem.fields
-        ? workItem.fields['System.Title']
-        : '';
-    const system_description = workItem.fields
-        ? workItem.fields['System.Description']
-        : '';
+    const system_title = workItem.fields ? workItem.fields['System.Title'] : '';
+    const system_description = workItem.fields ? workItem.fields['System.Description'] : '';
     payload.body = payload.body.replace(`\r\nAB#${workItem.id}`, '');
     const pr_title = `${payload.title} (GitHub PR #${payload.number})`;
     const pr_desc = `${payload.body.trim()}<br><br>GitHub <a href="${payload.url}">Pull Request #${payload.number}</a> created in <a href="${payload.repo_url}">${payload.repo_fullname}</a>`;
@@ -18884,7 +18882,7 @@ function editedPatchDocument(env, payload, workItem) {
         },
         {
             op: 'add',
-            path: '/fields/System.Description',
+            path: '/fields/System.History',
             value: pr_desc
         }
     ];
@@ -18895,19 +18893,20 @@ function editedPatchDocument(env, payload, workItem) {
     return response;
 }
 exports.editedPatchDocument = editedPatchDocument;
-function closedPatchDocument(env) {
-    const response = {
-        code: 500,
-        message: 'failed',
-        success: false,
-        patchDocument: undefined
-    };
+function closedPatchDocument(env, payload) {
+    const response = { code: 500, message: 'failed', success: false, patchDocument: undefined };
+    const pr_desc = `GitHub <a href="${payload.url}">Pull Request #${payload.number}</a> was closed`;
     let patchDocument = [];
     patchDocument = [
         {
             op: 'add',
             path: '/fields/System.State',
             value: env.ado_close_state
+        },
+        {
+            op: 'add',
+            path: '/fields/System.Description',
+            value: pr_desc
         }
     ];
     response.code = 200;
