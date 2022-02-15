@@ -12,4 +12,3 @@ jobs:
     - uses: actions/checkout@main
     - run: |
         npm install
-        npm run build
