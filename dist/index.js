@@ -33674,7 +33674,7 @@ function create(env, payload) {
             {
                 op: "add",
                 path: "/fields/System.Description",
-                value: `${payload.body.trim()}<br /><br />GitHub <a href="${payload.url}" target="_new">Pull Request #${payload.number}</a> created in <a href="${payload.repo_url}" target="_new">${payload.repo_fullname}</a>`
+                value: payload.body.trim()
             },
             {
                 op: 'add',
