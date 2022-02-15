@@ -6929,6 +6929,7 @@ const workitems_1 = __webpack_require__(445);
 const github_pr_1 = __webpack_require__(515);
 const patch = __importStar(__webpack_require__(286));
 let debug = false;
+const local_debug = false;
 const ado_org = '';
 const ado_project = '';
 const ado_token = '';
@@ -6968,7 +6969,7 @@ function getEnvInputs() {
 // prettier-ignore
 function getWebHookPayLoad() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-    const body = (github_1.context !== undefined && !debug) ? github_1.context.payload : sample_webhookpayload_1.default;
+    const body = (github_1.context !== undefined && !local_debug) ? github_1.context.payload : sample_webhookpayload_1.default;
     const payload = new payload_1.default();
     payload.action = body.action !== undefined ? body.action : '';
     payload.number = ((_a = body.pull_request) === null || _a === void 0 ? void 0 : _a.number) !== undefined ? (_b = body.pull_request) === null || _b === void 0 ? void 0 : _b.number : -1;

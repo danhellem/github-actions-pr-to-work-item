@@ -12,6 +12,7 @@ import {IResponse} from './interfaces/base-response'
 import * as patch from './patch-documents'
 
 let debug = false
+const local_debug = false
 const ado_org = ''
 const ado_project = ''
 const ado_token = ''
@@ -44,7 +45,7 @@ function getEnvInputs(): EnvInputs {
 
 // prettier-ignore
 function getWebHookPayLoad(): Payload {
-  const body: WebhookPayload = (context !== undefined && !debug) ? context.payload : sampleWebHookPayload
+  const body: WebhookPayload = (context !== undefined && !local_debug) ? context.payload : sampleWebHookPayload
   const payload: Payload = new Payload()  
 
   payload.action = body.action !== undefined ? body.action : ''
