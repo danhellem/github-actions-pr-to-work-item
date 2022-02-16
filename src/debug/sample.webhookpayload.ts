@@ -2,16 +2,16 @@ import {WebhookPayload} from '@actions/github/lib/interfaces'
 
 const sampleWebHookPayload: WebhookPayload = {
   action: 'opened',
-  number: 10,
+  number: 14,
   pull_request: {
-    url: 'https://api.github.com/repos/danhellem/myapp-web/pulls/10',
+    url: 'https://api.github.com/repos/danhellem/myapp-web/pulls/14',
     id: 847975880,
     node_id: 'MDExOlB1bGxSZXF1ZXN0NDE0MjA1NTg1',
-    html_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10',
-    diff_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10.diff',
-    patch_url: 'https://github.com/danhellem/Lorem-ipsum/pull/10.patch',
-    issue_url: 'https://api.github.com/repos/danhellem/myapp-web/issues/10',
-    number: 10,
+    html_url: 'https://github.com/danhellem/Lorem-ipsum/pull/14',
+    diff_url: 'https://github.com/danhellem/Lorem-ipsum/pull/14.diff',
+    patch_url: 'https://github.com/danhellem/Lorem-ipsum/pull/14.patch',
+    issue_url: 'https://api.github.com/repos/danhellem/myapp-web/issues/14',
+    number: 14,
     state: 'open',
     locked: false,
     title: 'Update README.md',
@@ -120,7 +120,7 @@ const sampleWebHookPayload: WebhookPayload = {
           site_admin: true
         },
         html_url: 'https://github.com/danhellem/Lorem-ipsum',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+        description: null,
         fork: false,
         url: 'https://api.github.com/repos/danhellem/Lorem-ipsum',
         forks_url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/forks',
@@ -283,7 +283,7 @@ const sampleWebHookPayload: WebhookPayload = {
           site_admin: true
         },
         html_url: 'https://github.com/danhellem/Lorem-ipsum',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+        description: null,
         fork: false,
         url: 'https://api.github.com/repos/danhellem/Lorem-ipsum',
         forks_url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/forks',
@@ -462,7 +462,7 @@ const sampleWebHookPayload: WebhookPayload = {
       site_admin: true
     },
     html_url: 'https://github.com/danhellem/Lorem-ipsum',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+    description: null,
     fork: false,
     url: 'https://api.github.com/repos/danhellem/Lorem-ipsum',
     forks_url: 'https://api.github.com/repos/danhellem/Lorem-ipsum/forks',
