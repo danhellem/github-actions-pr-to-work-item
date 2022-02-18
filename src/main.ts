@@ -185,7 +185,7 @@ async function run(): Promise<void> {
       }
     }
   } catch (err) {
-    core.setFailed(err.message)
+    core.setFailed(JSON.stringify(err))
   }
 }
 
