@@ -11,14 +11,14 @@ import {update as updatePr} from './github-pr'
 import {IResponse} from './interfaces/base-response'
 import * as patch from './patch-documents'
 
-let debug = false
-const local_debug = false
-const ado_org = ''
-const ado_project = ''
-const ado_token = ''
-const ado_wit = ''
+let verbose_logging = false
+const local_debug = false // set to true to fetch webhook json from local payload. For local debugging only!!
+const ado_org = '{organization}'
+const ado_project = '{project name}'
+const ado_token = '{azure devops personal access token}'
+const ado_wit = 'User Story'
+const github_token = '{github token}'
 const ado_area_path = ''
-const github_token = ''
 
 // prettier-ignore
 function getEnvInputs(): EnvInputs {
@@ -32,7 +32,7 @@ function getEnvInputs(): EnvInputs {
   env.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active'
   env.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token
   env.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path  
-  if (! debug) debug = process.env['debug'] !== undefined ? true : false
+  if (! verbose_logging) verbose_logging = process.env['debug'] !== undefined ? true : false
 
   if (!env.ado_token) { console.log('  Missing ado_token value') } 
   if (!env.ado_organization) { console.log('  Missing ado_organization value') } 
@@ -57,15 +57,15 @@ function getWebHookPayLoad(): Payload {
   payload.repo_url = body.repository?.html_url !== undefined ? body.repository.html_url : ''
   payload.repo_fullname = body.repository?.full_name !== undefined ? body.repository.full_name : ''
   payload.repo_owner = body.repository?.owner !== undefined ? body.repository.owner.login : ''
-  payload.sender_login = body.sender?.login !== undefined ? body.sender.login : ''
-  
-  let request_body: string = (body.pull_request?.body !== undefined || body.pull_request?.body !== null) ? body.pull_request?.body : ''
-  payload.body = (request_body !== null) ? request_body.replace(new RegExp('\\r?\\n','g'), '<br />') : ''
+  payload.sender_login = body.sender?.login !== undefined ? body.sender.login : ''  
+  payload.body = (body.pull_request?.body !== undefined || body.pull_request?.body !== null) ? body.pull_request?.body : ''  
 
   return payload
 }
 
 async function run(): Promise<void> {
+  if (verbose_logging) console.log('WARNING! Verbose logging is turned on.');
+  
   try {
     let workItem: WorkItem | null
     let workItemId: number
@@ -74,13 +74,13 @@ async function run(): Promise<void> {
 
     // set the env params
     const envInputs: EnvInputs = getEnvInputs()
-    if (debug) console.log(envInputs)
+    if (verbose_logging) console.log(envInputs)
 
     console.log('Getting payload values...')
 
     // get payload info
     const payload: Payload = getWebHookPayLoad()
-    if (debug) console.log(payload)
+    if (verbose_logging) console.log(payload)
 
     if (payload.sender_login === 'azure-boards[bot]') {
       console.log(`azure-boards[bot] sender, exiting action`)
@@ -91,16 +91,14 @@ async function run(): Promise<void> {
 
     // go and see if the ado work item already exists for this PR
     const fetchResult = await fetch(envInputs, payload)
-    if (debug) console.log(fetchResult)
+    if (verbose_logging) console.log(fetchResult)
 
     const response: IResponse = {code: 500, message: 'failed', success: false}
 
     // check to make sure your fetch was a success
     // success = return an work item or return a zero result
     if (!fetchResult.success) {
-      core.setFailed(
-        `Error fetching work item from Azure DevOps: ${fetchResult.message}`
-      )
+      core.setFailed(`Error fetching work item from Azure DevOps: ${fetchResult.message}`)
       return
     }
 
@@ -111,7 +109,7 @@ async function run(): Promise<void> {
       // create work item
       const createResult = await create(envInputs, payload)
 
-      if (debug) console.log(createResult)
+      if (verbose_logging) console.log(createResult)
 
       // if we successfully created the work item, then go and
       // link the PR in GitHub to the PR work item in ADO
@@ -121,22 +119,13 @@ async function run(): Promise<void> {
         workItem = createResult.workItem
         workItemId = workItem?.id !== undefined ? workItem?.id : -1
 
-        const pr: IResponse =
-          envInputs.github_token !== ''
-            ? await updatePr(
-                payload,
-                envInputs.github_token,
-                workItem?.id !== undefined ? workItem.id : -1
-              )
-            : response
+        const pr: IResponse = envInputs.github_token !== '' ? await updatePr(payload, envInputs.github_token, workItem?.id !== undefined ? workItem.id : -1) : response
 
-        if (debug) console.log(pr)
+        if (verbose_logging) console.log(pr)
 
         if (!pr.success) console.log(`Warning: ${pr.message}`)
       } else {
-        core.setFailed(
-          `Error creating work item in Azure DevOps: ${createResult.message}`
-        )
+        core.setFailed(`Error creating work item in Azure DevOps: ${createResult.message}`)
         return
       }
     } else {
@@ -156,77 +145,47 @@ async function run(): Promise<void> {
     // check the action type and go do specific updates
     switch (payload.action) {
       case 'opened': {
-        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.openedPatchDocument(
-          envInputs
-        )
+        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.openedPatchDocument(envInputs)
 
         // go update the work item to change the state
         // this gets the PR out of the new column and into something more actionable
-        if (
-          patchDocumentResponse.success &&
-          patchDocumentResponse !== undefined
-        ) {
-          const openedResult = await update(
-            envInputs,
-            workItemId,
-            patchDocumentResponse.patchDocument
-          )
+        if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
+          const openedResult = await update(envInputs, workItemId, patchDocumentResponse.patchDocument)
 
-          if (debug) console.log(openedResult)
+          if (verbose_logging) console.log(openedResult)
         }
 
         break
       }
 
       case 'edited': {
-        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.editedPatchDocument(
-          envInputs,
-          payload,
-          workItem
-        )
+        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.editedPatchDocument(envInputs, payload, workItem)
 
         // if success and patch document is not empty, then go update the work item
-        if (
-          patchDocumentResponse.success &&
-          patchDocumentResponse !== undefined
-        ) {
-          const updateResult = await update(
-            envInputs,
-            workItemId,
-            patchDocumentResponse.patchDocument
-          )
+        if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
+          const updateResult = await update(envInputs, workItemId, patchDocumentResponse.patchDocument)
 
-          if (debug) console.log(updateResult)
+          if (verbose_logging) console.log(updateResult)
         }
 
         break
       }
 
       case 'closed': {
-        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.closedPatchDocument(
-          envInputs,
-          payload
-        )
+        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.closedPatchDocument(envInputs, payload)
 
         // if success and patch document is not empty, then go update the work item
-        if (
-          patchDocumentResponse.success &&
-          patchDocumentResponse !== undefined
-        ) {
-          const closedResult = await update(
-            envInputs,
-            workItemId,
-            patchDocumentResponse.patchDocument
-          )
+        if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
+          const closedResult = await update(envInputs, workItemId, patchDocumentResponse.patchDocument)
 
-          if (debug) console.log(closedResult)
+          if (verbose_logging) console.log(closedResult)
         }
 
         break
       }
     }
   } catch (err) {
-    core.setFailed(err.message)
+    core.setFailed(JSON.stringify(err))
   }
 }
 

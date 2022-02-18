@@ -2,17 +2,8 @@ import {GitHub} from '@actions/github'
 import Payload from './viewmodels/payload'
 import {IResponse} from './interfaces/base-response'
 
-export async function update(
-  payload: Payload,
-  token: string,
-  workItemId: number
-): Promise<IResponse> {
-  const response: IResponse = {
-    code: 500,
-    message: 'failed',
-    success: false
-  }
-
+export async function update(payload: Payload, token: string, workItemId: number): Promise<IResponse> {
+  const response: IResponse = { code: 500, message: 'failed', success: false }
   const n = payload.body.includes(`AB#${workItemId}`)
 
   if (!n) {
@@ -33,7 +24,7 @@ export async function update(
         response.success = true
       }
     } catch (error) {
-      response.message = error
+      response.message = JSON.stringify(error)
     }
   } else {
     response.code = 200
