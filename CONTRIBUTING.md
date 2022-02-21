@@ -14,6 +14,7 @@ Thank you for contributing to github-pullrequest-to-work-item! Please see guidan
 - Clone your fork.
 - Create a new branch.
 - Make changes in TypeScript files (`*.ts`).
+- If it's the first time you're building this project locally, run `npm install` before proceeding.
 - Compile it using `npm run build`.
 - Debug it, if necessary.
 - Generate the `index.js` file (pack it!) using `npm run pack`.
