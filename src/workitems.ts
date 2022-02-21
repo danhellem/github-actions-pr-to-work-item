@@ -1,32 +1,18 @@
 import * as azdev from 'azure-devops-node-api'
-import {IWorkItemTrackingApi} from 'azure-devops-node-api/WorkItemTrackingApi'
-import {
-  WorkItem,
-  WorkItemQueryResult,
-  WorkItemReference
-} from 'azure-devops-node-api/interfaces/WorkItemTrackingInterfaces'
+import { IWorkItemTrackingApi } from 'azure-devops-node-api/WorkItemTrackingApi'
+import { WorkItem, WorkItemQueryResult, WorkItemReference } from 'azure-devops-node-api/interfaces/WorkItemTrackingInterfaces'
+import { JsonPatchDocument } from 'azure-devops-node-api/interfaces/common/VSSInterfaces'
+import showdown from 'showdown'
 
-import {IResponse} from './interfaces/base-response'
+import { IResponse } from './interfaces/base-response'
 import Payload from './viewmodels/payload'
 import EnvInputs from './viewmodels/env-inputs'
-import {JsonPatchDocument} from 'azure-devops-node-api/interfaces/common/VSSInterfaces'
 
-export async function fetch(
-  env: EnvInputs,
-  payload: Payload
-): Promise<IFetchResponse> {
-  const response: IFetchResponse = {
-    code: 500,
-    message: 'failed',
-    success: false,
-    workItem: null
-  }
 
+export async function fetch(env: EnvInputs, payload: Payload): Promise<IFetchResponse> {
+  const response: IFetchResponse = { code: 500, message: 'failed', success: false, workItem: null }
   const authHandler = azdev.getPersonalAccessTokenHandler(env.ado_token)
-  const connection = new azdev.WebApi(
-    `https://dev.azure.com/${env.ado_organization}`,
-    authHandler
-  )
+  const connection = new azdev.WebApi(`https://dev.azure.com/${env.ado_organization}`, authHandler)
 
   try {
     response.code = 500
@@ -43,24 +29,17 @@ export async function fetch(
     response.code = 500
     response.message = 'Error calling queryByWiql: '
 
-    const queryResult: WorkItemQueryResult = await client.queryByWiql(
-      wiql,
-      teamContext
-    )
+    const queryResult: WorkItemQueryResult = await client.queryByWiql(wiql, teamContext)
 
     // if query results = null then i think we have issue with the project name
     if (queryResult === null) {
       response.code = 500
-      response.message =
-        'Error empty queryResult: Project name appears to be invalid or query is not formed correctly'
+      response.message = 'Error empty queryResult: Project name appears to be invalid or query is not formed correctly'
       return response
     }
 
     // check to see if the query returned any results
-    const workItemReference: WorkItemReference | null =
-      queryResult.workItems !== null && queryResult.workItems !== undefined
-        ? queryResult.workItems[0]
-        : null
+    const workItemReference: WorkItemReference | null = queryResult.workItems !== null && queryResult.workItems !== undefined ? queryResult.workItems[0] : null
 
     // if we have results, fetch the work item
     if (workItemReference !== null && workItemReference !== undefined) {
@@ -68,13 +47,7 @@ export async function fetch(
       response.message = 'Error calling getWorkItem: '
 
       // fetch work item by id
-      const item: WorkItem = await client.getWorkItem(
-        workItemReference.id !== undefined ? workItemReference.id : 0,
-        undefined,
-        undefined,
-        undefined,
-        env.ado_project
-      )
+      const item: WorkItem = await client.getWorkItem(workItemReference.id !== undefined ? workItemReference.id : 0, undefined, undefined, undefined, env.ado_project)
 
       response.code = 200
       response.message = 'Success'
@@ -99,16 +72,8 @@ export async function fetch(
   }
 }
 
-export async function create(
-  env: EnvInputs,
-  payload: Payload
-): Promise<IFetchResponse> {
-  const response: IFetchResponse = {
-    code: 500,
-    message: 'failed',
-    success: false,
-    workItem: null
-  }
+export async function create(env: EnvInputs, payload: Payload): Promise<IFetchResponse> {
+  const response: IFetchResponse = { code: 500, message: 'failed', success: false, workItem: null }
 
   // prettier-ignore
   const patchDocument: JsonPatchDocument | any = [
@@ -128,52 +93,63 @@ export async function create(
       value: `GitHub <a href="${payload.url}" target="_new">Pull Request #${payload.number}</a> created in <a href="${payload.repo_url}" target="_new">${payload.repo_fullname}</a>`
     },
     {
-      op: "add",
-      path: "/fields/System.Description",
-      value: `${payload.body.trim()}<br /><br />GitHub <a href="${payload.url}" target="_new">Pull Request #${payload.number}</a> created in <a href="${payload.repo_url}" target="_new">${payload.repo_fullname}</a>`
-    },
-    {
       op: 'add',
       path: '/relations/-',
       value: {
         rel: 'Hyperlink',
         url: payload.url
       }
-    }
+    },
+    {
+      op: "add",
+      path: "/fields/Microsoft.VSTS.Common.StackRank",
+      value: 1
+    },
+    {
+      op: "add",
+      path: "/fields/Microsoft.VSTS.Common.BacklogPriority",
+      value: 1
+    } 
   ]
 
-  if (env.ado_area_path != "") {
+  // if there is text, then save it to the description
+  if (payload.body.length > 0) {
+    const converter = new showdown.Converter();
+    const html = converter.makeHtml(payload.body);
+    
     patchDocument.push({
       op: "add",
-      path: "/fields/System.AreaPath",
+      path: "/fields/System.Description",
+      value: html
+    }, 
+    {
+      op: "add",
+      path: "/fields/Microsoft.VSTS.TCM.ReproSteps",
+      value: html
+    })
+  }  
+
+  if (env.ado_area_path !== '') {
+    patchDocument.push({
+      op: 'add',
+      path: '/fields/System.AreaPath',
       value: env.ado_area_path
-    });
+    })
   }
 
   const authHandler = azdev.getPersonalAccessTokenHandler(env.ado_token)
-  const connection = new azdev.WebApi(
-    `https://dev.azure.com/${env.ado_organization}`,
-    authHandler
-  )
+  const connection = new azdev.WebApi(`https://dev.azure.com/${env.ado_organization}`, authHandler)
 
   try {
     response.message = 'Error calling getWorkItemTrackingApi: '
     const client: IWorkItemTrackingApi = await connection.getWorkItemTrackingApi()
 
     //create work item
-    const workItem: WorkItem = await client.createWorkItem(
-      [],
-      patchDocument,
-      env.ado_project,
-      env.ado_wit,
-      false,
-      false
-    )
+    const workItem: WorkItem = await client.createWorkItem([], patchDocument, env.ado_project, env.ado_wit, false, false)
 
     // check to see if the work item is null or undefined
     if (workItem === null || workItem === undefined) {
-      response.message =
-        'Error creating work item: Work item is null or undefined'
+      response.message = 'Error creating work item: Work item is null or undefined' 
     } else {
       response.code = 200
       response.message = 'Success'
@@ -191,46 +167,26 @@ export async function create(
   }
 }
 
-export async function update(
-  env: EnvInputs,
-  workItemId: number,
-  patchDocument: JsonPatchDocument | undefined
-): Promise<IFetchResponse> {
-  const response: IFetchResponse = {
-    code: 500,
-    message: 'failed',
-    success: false,
-    workItem: null
-  }
+export async function update(env: EnvInputs, workItemId: number, patchDocument: JsonPatchDocument | undefined): Promise<IFetchResponse> {
+  const response: IFetchResponse = { code: 500, message: 'failed', success: false, workItem: null }
 
   if (patchDocument === undefined) {
     return response
   }
 
   const authHandler = azdev.getPersonalAccessTokenHandler(env.ado_token)
-  const connection = new azdev.WebApi(
-    `https://dev.azure.com/${env.ado_organization}`,
-    authHandler
-  )
+  const connection = new azdev.WebApi(`https://dev.azure.com/${env.ado_organization}`, authHandler)
 
   try {
     response.message = 'Error calling getWorkItemTrackingApi: '
     const client: IWorkItemTrackingApi = await connection.getWorkItemTrackingApi()
 
     //create work item
-    const workItemResult: WorkItem = await client.updateWorkItem(
-      [],
-      patchDocument,
-      workItemId,
-      env.ado_project,
-      false,
-      false
-    )
+    const workItemResult: WorkItem = await client.updateWorkItem([], patchDocument, workItemId, env.ado_project, false, false)
 
     // check to see if the work item is null or undefined
     if (workItemResult === null || workItemResult === undefined) {
-      response.message =
-        'Error updating work item: Work item result is null or undefined'
+      response.message = 'Error updating work item: Work item result is null or undefined'
     } else {
       response.code = 200
       response.message = 'Success'

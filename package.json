@@ -6,12 +6,10 @@
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
     "pack": "ncc build",
     "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run pack && npm test"
+    "all": "npm run build && npm run pack && npm test"
   },
   "repository": {
     "type": "git",
@@ -27,11 +25,13 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^2.1.1",
-    "azure-devops-node-api": "^10.1.0"
+    "azure-devops-node-api": "^10.1.0",
+    "showdown": "^1.9.1"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
     "@types/node": "^12.7.12",
+    "@types/showdown": "^1.9.4",
     "@typescript-eslint/parser": "^2.8.0",
     "@zeit/ncc": "^0.20.5",
     "eslint": "^6.8.0",

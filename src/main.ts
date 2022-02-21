@@ -22,7 +22,7 @@ let debug: boolean = false
 
 // prettier-ignore
 function getEnvInputs(): EnvInputs {
-  const vm: EnvInputs = new EnvInputs()
+  const env: EnvInputs = new EnvInputs()
 
   vm.ado_token = process.env['ado_token'] !== undefined ? process.env['ado_token'] : ado_token
   vm.ado_organization = process.env['ado_organization'] !== undefined ? process.env['ado_organization'] : ado_org
@@ -34,104 +34,105 @@ function getEnvInputs(): EnvInputs {
   vm.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path
   debug = process.env['debug'] !== undefined ? process.env['debug'].toLowerCase() == 'true' : debug
 
-  return vm
+  if (!env.ado_token) { console.log('  Missing ado_token value') } 
+  if (!env.ado_organization) { console.log('  Missing ado_organization value') } 
+  if (!env.ado_project) { console.log('  Missing ado_project value') } 
+  if (!env.ado_wit) { console.log('  Missing ado_wit value') }   
+  if (!env.github_token) { console.log('  Missing github_token value') }  
+
+  return env
 }
 
 // prettier-ignore
 function getWebHookPayLoad(): Payload {
-  const body: WebhookPayload = (context !== undefined && !debug) ? context.payload : sampleWebHookPayload
-  const vm: Payload = new Payload()
+  const body: WebhookPayload = (context !== undefined && !local_debug) ? context.payload : sampleWebHookPayload
+  const payload: Payload = new Payload()  
 
-  vm.action = body.action !== undefined ? body.action : ''
-  vm.number = body.pull_request?.number !== undefined ? body.pull_request?.number : -1
-  vm.title = body.pull_request !== undefined ? body.pull_request['title'] : ''
-  vm.url = body.pull_request?.html_url !== undefined ? body.pull_request.html_url : ''
-  vm.merged = body['merged'] !== undefined ? body['merged'] : false
-  vm.repo_name = body.repository?.name !== undefined ? body.repository.name : ''
-  vm.repo_url = body.repository?.html_url !== undefined ? body.repository.html_url : ''
-  vm.repo_fullname = body.repository?.full_name !== undefined ? body.repository.full_name : ''
-  vm.repo_owner = body.repository?.owner !== undefined ? body.repository.owner.login : ''
-  vm.sender_login = body.sender?.login !== undefined ? body.sender.login : ''
-  vm.body = body.pull_request?.body !== undefined ? body.pull_request?.body : ''
+  payload.action = body.action !== undefined ? body.action : ''
+  payload.number = body.pull_request?.number !== undefined ? body.pull_request?.number : -1
+  payload.title = body.pull_request !== undefined ? body.pull_request['title'] : ''
+  payload.url = body.pull_request?.html_url !== undefined ? body.pull_request.html_url : ''
+  payload.merged = body['merged'] !== undefined ? body['merged'] : false
+  payload.repo_name = body.repository?.name !== undefined ? body.repository.name : ''
+  payload.repo_url = body.repository?.html_url !== undefined ? body.repository.html_url : ''
+  payload.repo_fullname = body.repository?.full_name !== undefined ? body.repository.full_name : ''
+  payload.repo_owner = body.repository?.owner !== undefined ? body.repository.owner.login : ''
+  payload.sender_login = body.sender?.login !== undefined ? body.sender.login : ''  
+  payload.body = (body.pull_request?.body !== undefined || body.pull_request?.body !== null) ? body.pull_request?.body : ''  
 
-  vm.body = vm.body.replace(new RegExp('\\r?\\n','g'), '<br />')
-
-  return vm
+  return payload
 }
 
 async function run(): Promise<void> {
+  if (verbose_logging) console.log('WARNING! Verbose logging is turned on.');
+  
   try {
     let workItem: WorkItem | null
     let workItemId: number
 
+    console.log('Getting environmental variables...')
+
     // set the env params
     const envInputs: EnvInputs = getEnvInputs()
-    if (debug) console.log(envInputs)
+    if (verbose_logging) console.log(envInputs)
+
+    console.log('Getting payload values...')
 
     // get payload info
     const payload: Payload = getWebHookPayLoad()
-    if (debug) console.log(payload)
+    if (verbose_logging) console.log(payload)
 
     if (payload.sender_login === 'azure-boards[bot]') {
       console.log(`azure-boards[bot] sender, exiting action`)
       return
     }
 
+    console.log('Fetching id from work items...')
+
     // go and see if the ado work item already exists for this PR
     const fetchResult = await fetch(envInputs, payload)
-    if (debug) console.log(fetchResult)
+    if (verbose_logging) console.log(fetchResult)
 
-    const response: IResponse = {
-      code: 500,
-      message: 'failed',
-      success: false
-    }
+    const response: IResponse = {code: 500, message: 'failed', success: false}
 
     // check to make sure your fetch was a success
     // success = return an work item or return a zero result
     if (!fetchResult.success) {
-      core.setFailed(
-        `Error fetching work item from Azure DevOps: ${fetchResult.message}`
-      )
+      core.setFailed(`Error fetching work item from Azure DevOps: ${fetchResult.message}`)
       return
     }
 
     // if a work item is not found then lets go create one
     if (fetchResult.code === 404) {
+      console.log('Work item does not exist, creating new one...')
+
       // create work item
       const createResult = await create(envInputs, payload)
 
-      if (debug) console.log(createResult)
+      if (verbose_logging) console.log(createResult)
 
       // if we successfully created the work item, then go and
       // link the PR in GitHub to the PR work item in ADO
       if (createResult.success) {
+        console.log('  create successfull')
+
         workItem = createResult.workItem
         workItemId = workItem?.id !== undefined ? workItem?.id : -1
 
-        const pr: IResponse =
-          envInputs.github_token !== ''
-            ? await updatePr(
-                payload,
-                envInputs.github_token,
-                workItem?.id !== undefined ? workItem.id : -1
-              )
-            : response
+        const pr: IResponse = envInputs.github_token !== '' ? await updatePr(payload, envInputs.github_token, workItem?.id !== undefined ? workItem.id : -1) : response
 
-        if (debug) console.log(pr)
+        if (verbose_logging) console.log(pr)
 
         if (!pr.success) console.log(`Warning: ${pr.message}`)
       } else {
-        core.setFailed(
-          `Error creating work item in Azure DevOps: ${createResult.message}`
-        )
+        core.setFailed(`Error creating work item in Azure DevOps: ${createResult.message}`)
         return
       }
     } else {
       workItem = fetchResult.workItem
       workItemId = workItem?.id !== undefined ? workItem?.id : -1
 
-      console.log(`Existing work item found: ${workItem?.id}`)
+      console.log(`  Existing work item found: ${workItem?.id}`)
     }
 
     // for some reason workItem is still null
@@ -144,76 +145,47 @@ async function run(): Promise<void> {
     // check the action type and go do specific updates
     switch (payload.action) {
       case 'opened': {
-        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.openedPatchDocument(
-          envInputs
-        )
+        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.openedPatchDocument(envInputs)
 
         // go update the work item to change the state
         // this gets the PR out of the new column and into something more actionable
-        if (
-          patchDocumentResponse.success &&
-          patchDocumentResponse !== undefined
-        ) {
-          const openedResult = await update(
-            envInputs,
-            workItemId,
-            patchDocumentResponse.patchDocument
-          )
+        if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
+          const openedResult = await update(envInputs, workItemId, patchDocumentResponse.patchDocument)
 
-          if (debug) console.log(openedResult)
+          if (verbose_logging) console.log(openedResult)
         }
 
         break
       }
 
       case 'edited': {
-        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.editedPatchDocument(
-          envInputs,
-          payload,
-          workItem
-        )
+        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.editedPatchDocument(envInputs, payload, workItem)
 
         // if success and patch document is not empty, then go update the work item
-        if (
-          patchDocumentResponse.success &&
-          patchDocumentResponse !== undefined
-        ) {
-          const updateResult = await update(
-            envInputs,
-            workItemId,
-            patchDocumentResponse.patchDocument
-          )
+        if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
+          const updateResult = await update(envInputs, workItemId, patchDocumentResponse.patchDocument)
 
-          if (debug) console.log(updateResult)
+          if (verbose_logging) console.log(updateResult)
         }
 
         break
       }
 
       case 'closed': {
-        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.closedPatchDocument(
-          envInputs
-        )
+        const patchDocumentResponse: patch.IPatchDocumentResponse = patch.closedPatchDocument(envInputs, payload)
 
         // if success and patch document is not empty, then go update the work item
-        if (
-          patchDocumentResponse.success &&
-          patchDocumentResponse !== undefined
-        ) {
-          const closedResult = await update(
-            envInputs,
-            workItemId,
-            patchDocumentResponse.patchDocument
-          )
+        if (patchDocumentResponse.success && patchDocumentResponse !== undefined) {
+          const closedResult = await update(envInputs, workItemId, patchDocumentResponse.patchDocument)
 
-          if (debug) console.log(closedResult)
+          if (verbose_logging) console.log(closedResult)
         }
 
         break
       }
     }
-  } catch (error) {
-    core.setFailed(error.message)
+  } catch (err) {
+    core.setFailed(JSON.stringify(err))
   }
 }
 

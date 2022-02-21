@@ -4,7 +4,6 @@ on: # rebuild any PRs and main branch changes
   push:
     branches:
       - master
-      - 'releases/*'
 
 jobs:
   build: # make sure build/ci work properly
@@ -13,9 +12,3 @@ jobs:
     - uses: actions/checkout@main
     - run: |
         npm install
-        npm run all
- # test: # make sure the action works on a clean machine without building
- #   runs-on: ubuntu-latest
- #   steps:
- #   - uses: actions/checkout@main
- #   - uses: ./     
