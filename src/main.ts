@@ -59,8 +59,8 @@ function getWebHookPayLoad(): Payload {
   payload.repo_url = body.repository?.html_url !== undefined ? body.repository.html_url : ''
   payload.repo_fullname = body.repository?.full_name !== undefined ? body.repository.full_name : ''
   payload.repo_owner = body.repository?.owner !== undefined ? body.repository.owner.login : ''
-  payload.sender_login = body.sender?.login !== undefined ? body.sender.login : ''  
-  payload.body = (body.pull_request?.body !== undefined || body.pull_request?.body !== null) ? body.pull_request?.body : ''  
+  payload.sender_login = body.sender?.login !== undefined ? body.sender.login : ''
+  payload.body = body.pull_request != undefined && body.pull_request.body != undefined ? body.pull_request.body : ''
 
   return payload
 }
