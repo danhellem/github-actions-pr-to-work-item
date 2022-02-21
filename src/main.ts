@@ -14,7 +14,9 @@ import * as patch from './patch-documents'
 const ado_org = ''
 const ado_project = ''
 const ado_token = ''
-const ado_wit = 'Pull Request'
+const ado_wit = 'Task'
+const ad_active_state = 'Active'
+const ado_close_state = 'Closed'
 const ado_area_path = ''
 const github_token = ''
 
@@ -28,8 +30,8 @@ function getEnvInputs(): EnvInputs {
   vm.ado_organization = process.env['ado_organization'] !== undefined ? process.env['ado_organization'] : ado_org
   vm.ado_project = process.env['ado_project'] !== undefined ? process.env['ado_project'] : ado_project
   vm.ado_wit = process.env['ado_wit'] !== undefined ? process.env['ado_wit'] : ado_wit
-  vm.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : 'Closed'
-  vm.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active'
+  vm.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : ad_active_state
+  vm.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : ado_close_state
   vm.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token
   vm.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path
   debug = process.env['debug'] !== undefined ? process.env['debug'].toLowerCase() == 'true' : debug
