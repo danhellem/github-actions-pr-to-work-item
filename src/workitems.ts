@@ -64,7 +64,7 @@ export async function fetch(env: EnvInputs, payload: Payload): Promise<IFetchRes
 
     return response
   } catch (ex) {
-    response.message.concat(JSON.stringify(ex))
+    response.message = response.message.concat(JSON.stringify(ex))
     response.workItem = null
     response.success = false
 
@@ -159,7 +159,7 @@ export async function create(env: EnvInputs, payload: Payload): Promise<IFetchRe
 
     return response
   } catch (ex) {
-    response.message.concat(JSON.stringify(ex))
+    response.message = response.message.concat(JSON.stringify(ex))
     response.workItem = null
     response.success = false
 
@@ -196,7 +196,7 @@ export async function update(env: EnvInputs, workItemId: number, patchDocument: 
 
     return response
   } catch (ex) {
-    response.message.concat(JSON.stringify(ex))
+    response.message = response.message.concat(JSON.stringify(ex))
     response.workItem = null
     response.success = false
 
