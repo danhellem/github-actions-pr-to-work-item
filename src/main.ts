@@ -17,6 +17,8 @@ const ado_org = '{organization}'
 const ado_project = '{project name}'
 const ado_token = '{azure devops personal access token}'
 const ado_wit = 'User Story'
+const ado_active_state = 'Active'
+const ado_close_state = 'Close'
 const github_token = '{github token}'
 const ado_area_path = ''
 
@@ -28,8 +30,8 @@ function getEnvInputs(): EnvInputs {
   env.ado_organization = process.env['ado_organization'] !== undefined ? process.env['ado_organization'] : ado_org
   env.ado_project = process.env['ado_project'] !== undefined ? process.env['ado_project'] : ado_project
   env.ado_wit = process.env['ado_wit'] !== undefined ? process.env['ado_wit'] : ado_wit
-  env.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : 'Closed'
-  env.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active'
+  env.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : ado_close_state
+  env.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : ado_active_state
   env.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token
   env.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path  
   if (! verbose_logging) verbose_logging = process.env['debug'] !== undefined ? true : false
@@ -58,7 +60,7 @@ function getWebHookPayLoad(): Payload {
   payload.repo_fullname = body.repository?.full_name !== undefined ? body.repository.full_name : ''
   payload.repo_owner = body.repository?.owner !== undefined ? body.repository.owner.login : ''
   payload.sender_login = body.sender?.login !== undefined ? body.sender.login : ''  
-  payload.body = (body.pull_request?.body !== undefined || body.pull_request?.body !== null) ? body.pull_request?.body : ''  
+  payload.body = body.pull_request != undefined && body.pull_request.body != undefined ? body.pull_request.body : ''
 
   return payload
 }

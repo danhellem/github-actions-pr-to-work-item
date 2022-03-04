@@ -3067,7 +3067,7 @@ const sampleWebHookPayload = {
             type: 'User',
             site_admin: true
         },
-        body: null,
+        body: '',
         created_at: '2020-05-06T16:34:25Z',
         updated_at: '2020-05-06T16:34:25Z',
         closed_at: null,
@@ -12082,6 +12082,8 @@ const ado_org = '{organization}';
 const ado_project = '{project name}';
 const ado_token = '{azure devops personal access token}';
 const ado_wit = 'User Story';
+const ado_active_state = 'Active';
+const ado_close_state = 'Close';
 const github_token = '{github token}';
 const ado_area_path = '';
 // prettier-ignore
@@ -12091,8 +12093,8 @@ function getEnvInputs() {
     env.ado_organization = process.env['ado_organization'] !== undefined ? process.env['ado_organization'] : ado_org;
     env.ado_project = process.env['ado_project'] !== undefined ? process.env['ado_project'] : ado_project;
     env.ado_wit = process.env['ado_wit'] !== undefined ? process.env['ado_wit'] : ado_wit;
-    env.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : 'Closed';
-    env.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : 'Active';
+    env.ado_close_state = process.env['ado_close_state'] !== undefined ? process.env['ado_close_state'] : ado_close_state;
+    env.ado_active_state = process.env['ado_active_state'] !== undefined ? process.env['ado_active_state'] : ado_active_state;
     env.github_token = process.env['github_token'] !== undefined ? process.env['github_token'] : github_token;
     env.ado_area_path = process.env['ado_area_path'] !== undefined ? process.env['ado_area_path'] : ado_area_path;
     if (!verbose_logging)
@@ -12116,7 +12118,7 @@ function getEnvInputs() {
 }
 // prettier-ignore
 function getWebHookPayLoad() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     const body = (github_1.context !== undefined && !local_debug) ? github_1.context.payload : sample_webhookpayload_1.default;
     const payload = new payload_1.default();
     payload.action = body.action !== undefined ? body.action : '';
@@ -12129,7 +12131,7 @@ function getWebHookPayLoad() {
     payload.repo_fullname = ((_f = body.repository) === null || _f === void 0 ? void 0 : _f.full_name) !== undefined ? body.repository.full_name : '';
     payload.repo_owner = ((_g = body.repository) === null || _g === void 0 ? void 0 : _g.owner) !== undefined ? body.repository.owner.login : '';
     payload.sender_login = ((_h = body.sender) === null || _h === void 0 ? void 0 : _h.login) !== undefined ? body.sender.login : '';
-    payload.body = (((_j = body.pull_request) === null || _j === void 0 ? void 0 : _j.body) !== undefined || ((_k = body.pull_request) === null || _k === void 0 ? void 0 : _k.body) !== null) ? (_l = body.pull_request) === null || _l === void 0 ? void 0 : _l.body : '';
+    payload.body = body.pull_request != undefined && body.pull_request.body != undefined ? body.pull_request.body : '';
     return payload;
 }
 function run() {
@@ -38771,7 +38773,7 @@ function fetch(env, payload) {
             return response;
         }
         catch (ex) {
-            response.message.concat(JSON.stringify(ex));
+            response.message = response.message.concat(JSON.stringify(ex));
             response.workItem = null;
             response.success = false;
             return response;
@@ -38859,7 +38861,7 @@ function create(env, payload) {
             return response;
         }
         catch (ex) {
-            response.message.concat(JSON.stringify(ex));
+            response.message = response.message.concat(JSON.stringify(ex));
             response.workItem = null;
             response.success = false;
             return response;
@@ -38893,7 +38895,7 @@ function update(env, workItemId, patchDocument) {
             return response;
         }
         catch (ex) {
-            response.message.concat(JSON.stringify(ex));
+            response.message = response.message.concat(JSON.stringify(ex));
             response.workItem = null;
             response.success = false;
             return response;

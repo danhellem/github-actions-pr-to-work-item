@@ -38,7 +38,7 @@ const sampleWebHookPayload: WebhookPayload = {
       type: 'User',
       site_admin: true
     },
-    body: null,
+    body: '',
     created_at: '2020-05-06T16:34:25Z',
     updated_at: '2020-05-06T16:34:25Z',
     closed_at: null,

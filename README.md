@@ -35,7 +35,7 @@ The id of the work item created or update
 name: Sync Pull Request to Azure Boards
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, edited, closed]
     branches:
       - master
@@ -50,9 +50,13 @@ jobs:
         github_token: '${{ secrets.GH_TOKEN }}'    
         ado_organization: 'privatepreview'
         ado_project: 'Agile'
-        ado_wit: 'Pull Request' 
+        ado_wit: 'User Story' 
         ado_new_state: 'New'
         ado_active_state: 'Active'
         ado_close_state: 'Closed'
         ado_area_path: 'optional_area_path\\optional_area_path'
 ```
+
+# Want to contribute?
+
+See [Contribution guidelines](CONTRIBUTING.md) for more information
