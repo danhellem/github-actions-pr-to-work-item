@@ -1,3 +1,5 @@
+| The usage of this marketplace extension is pretty low and we have decided to deprecate it.
+
 ![build-test](https://github.com/danhellem/github-actions-pr-to-work-item/workflows/build-test/badge.svg?branch=master)
 
 # Sync GitHub Pull Requests to Azure DevOps
